@@ -6,7 +6,7 @@ from .build.model import LinkType_identity as identity
 from .build.model import LinkType_exponential as exponential
 
 import numpy as np
-from scipy.special import factorial
+from scipy.special import gammaln
 
 from .base import ModelGeneralizedLinear, ModelFirstOrder, ModelSecondOrder, \
     ModelSelfConcordant
@@ -198,7 +198,7 @@ class ModelPoisReg(ModelGeneralizedLinear,
 
         Parameters
         ----------
-        dual_coeffs : np.ndarray
+        dual_coeffs : `np.ndarray`
             Dual coefficients
 
         Returns
@@ -212,6 +212,6 @@ class ModelPoisReg(ModelGeneralizedLinear,
         non_zero_labels = self.labels != 0
         dual_loss = self.labels[non_zero_labels] * (
             1 + np.log(dual_coeffs / self.labels[non_zero_labels]))
+        dual_loss += np.mean(gammaln(self.labels[non_zero_labels] + 1))
 
-        dual_loss += np.mean(np.log(factorial(self.labels[non_zero_labels])))
         return np.mean(dual_loss) * self._sdca_rand_max / self.n_samples
