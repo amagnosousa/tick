@@ -75,37 +75,50 @@ class Test(TestSolver):
         weight0 = np.random.rand(n_features)
         features = np.random.rand(n_samples, n_features)
 
-        simu = SimuPoisReg(weight0, intercept=None,
-                           features=features, n_samples=n_samples,
-                           link='identity', verbose=False)
-        features, labels = simu.simulate()
+        for intercept in [None, 0.45]:
+            if intercept is None:
+                fit_intercept = False
+            else:
+                fit_intercept = True
 
-        model = ModelPoisReg(fit_intercept=False, link='identity')
-        model.fit(features, labels)
+            simu = SimuPoisReg(weight0, intercept=intercept,
+                               features=features, n_samples=n_samples,
+                               link='identity', verbose=False)
+            features, labels = simu.simulate()
 
-        sdca = SDCA(l_l2sq=l_l2sq, max_iter=100, verbose=False,
-                    tol=1e-14, seed=Test.sto_seed)
+            model = ModelPoisReg(fit_intercept=fit_intercept, link='identity')
+            model.fit(features, labels)
 
-        sdca.set_model(model).set_prox(ProxZero())
-        start_dual = np.sqrt(sdca._rand_max * l_l2sq)
-        start_dual = start_dual * np.ones(sdca._rand_max)
+            sdca = SDCA(l_l2sq=l_l2sq, max_iter=100, verbose=False,
+                        tol=1e-14, seed=Test.sto_seed)
 
-        sdca.solve(start_dual)
+            sdca.set_model(model).set_prox(ProxZero())
+            start_dual = np.sqrt(sdca._rand_max * l_l2sq)
+            start_dual = start_dual * np.ones(sdca._rand_max)
 
-        # Check that duality gap is 0
-        self.assertAlmostEqual(sdca.objective(sdca.solution),
-                               sdca.dual_objective(sdca.dual_solution))
+            sdca.solve(start_dual)
 
-        # Check that original vector is approximatively retrieved
-        np.testing.assert_array_almost_equal(weight0, sdca.solution, decimal=1)
+            # Check that duality gap is 0
+            self.assertAlmostEqual(sdca.objective(sdca.solution),
+                                   sdca.dual_objective(sdca.dual_solution))
 
-        # Ensure that we solve the same problem as other solvers
-        svrg = SVRG(max_iter=100, verbose=False,
-                    tol=1e-14, seed=Test.sto_seed)
+            # Check that original vector is approximatively retrieved
+            if fit_intercept:
+                original_coeffs = np.hstack((weight0, intercept))
+            else:
+                original_coeffs = weight0
 
-        svrg.set_model(model).set_prox(ProxL2Sq(l_l2sq))
-        svrg.solve(0.5 * np.ones(model.n_coeffs), step=1e-2)
-        np.testing.assert_array_almost_equal(svrg.solution, sdca.solution)
+            np.testing.assert_array_almost_equal(original_coeffs, sdca.solution,
+                                                 decimal=1)
+
+            # Ensure that we solve the same problem as other solvers
+            svrg = SVRG(max_iter=100, verbose=False,
+                        tol=1e-14, seed=Test.sto_seed)
+
+            svrg.set_model(model).set_prox(ProxL2Sq(l_l2sq))
+            svrg.solve(0.5 * np.ones(model.n_coeffs), step=1e-2)
+            np.testing.assert_array_almost_equal(svrg.solution, sdca.solution,
+                                                 decimal=4)
 
 
 if __name__ == '__main__':

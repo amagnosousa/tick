@@ -97,10 +97,6 @@ double ModelPoisReg::sdca_dual_min_i_identity(const ulong i,
                                               const ArrayDouble &primal_vector,
                                               const double previous_delta_dual_i,
                                               double l_l2sq) {
-  if (fit_intercept) {
-    TICK_ERROR("SDCA not implemented with fit intercept yet");
-  }
-
   if (!ready_features_norm_sq) {
     compute_features_norm_sq();
   }
