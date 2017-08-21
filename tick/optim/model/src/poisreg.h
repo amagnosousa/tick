@@ -49,7 +49,7 @@ class ModelPoisReg : public ModelGeneralizedLinear {
                                  ArrayDouble &out_primal_vector) override;
 
   SArrayULongPtr get_sdca_index_map() override {
-    if (link_type == LinkType::exponential){
+    if (link_type == LinkType::exponential) {
       return nullptr;
     }
     if (!non_zero_label_map_computed) init_non_zero_label_map();

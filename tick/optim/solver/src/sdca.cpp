@@ -44,13 +44,14 @@ void SDCA::solve() {
     // Pick i uniformly at random
     ulong i = get_next_i();
     ulong feature_index = i;
-    if (feature_index_map != nullptr){
+    if (feature_index_map != nullptr) {
       feature_index = (*feature_index_map)[i];
     }
 
     // Maximize the dual coordinate i
     const double
-      delta_dual_i = model->sdca_dual_min_i(feature_index, dual_vector[i], iterate, delta[i], scaled_l_l2sq);
+      delta_dual_i =
+      model->sdca_dual_min_i(feature_index, dual_vector[i], iterate, delta[i], scaled_l_l2sq);
     // Update the dual variable
     dual_vector[i] += delta_dual_i;
 
@@ -79,7 +80,7 @@ void SDCA::set_starting_iterate() {
 
   // If it is not ModelPoisReg, primal vector will be full of 0 as dual vector
   bool can_initialize_primal_to_zero = true;
-  if (dynamic_cast<ModelPoisReg *>(model.get())){
+  if (dynamic_cast<ModelPoisReg *>(model.get())) {
     std::shared_ptr<ModelPoisReg> casted_model = std::dynamic_pointer_cast<ModelPoisReg>(model);
     if (casted_model->get_link_type() == LinkType::identity) {
       can_initialize_primal_to_zero = false;
@@ -104,7 +105,6 @@ void SDCA::set_starting_iterate() {
     set_starting_iterate(dual_vector);
   }
 }
-
 
 void SDCA::set_starting_iterate(ArrayDouble &dual_vector) {
   if (dual_vector.size() != rand_max) {

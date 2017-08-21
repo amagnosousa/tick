@@ -10,10 +10,10 @@ ModelGeneralizedLinear::ModelGeneralizedLinear(const SBaseArrayDouble2dPtr featu
                                                const SArrayDoublePtr labels,
                                                const bool fit_intercept,
                                                const int n_threads)
-    : ModelLabelsFeatures(features, labels),
-      n_threads(n_threads >= 1 ? n_threads : std::thread::hardware_concurrency()),
-      fit_intercept(fit_intercept),
-      ready_features_norm_sq(false) {}
+  : ModelLabelsFeatures(features, labels),
+    n_threads(n_threads >= 1 ? n_threads : std::thread::hardware_concurrency()),
+    fit_intercept(fit_intercept),
+    ready_features_norm_sq(false) {}
 
 void ModelGeneralizedLinear::compute_features_norm_sq() {
   if (!ready_features_norm_sq) {
@@ -92,17 +92,16 @@ void ModelGeneralizedLinear::grad(const ArrayDouble &coeffs,
 double ModelGeneralizedLinear::loss(const ArrayDouble &coeffs) {
   return parallel_map_additive_reduce(n_threads, n_samples, &ModelGeneralizedLinear::loss_i,
                                       this, coeffs)
-      / n_samples;
+    / n_samples;
 }
 
-
 void ModelGeneralizedLinear::sdca_primal_dual_relation(const double l_l2sq,
-                                                    const ArrayDouble &dual_vector,
-                                                    ArrayDouble &out_primal_vector) {
+                                                       const ArrayDouble &dual_vector,
+                                                       ArrayDouble &out_primal_vector) {
   if (dual_vector.size() != get_n_samples()) {
     TICK_ERROR("dual vector should have shape of (" << get_n_samples() << ", )");
   }
-  if (out_primal_vector.size() != get_n_coeffs()){
+  if (out_primal_vector.size() != get_n_coeffs()) {
     TICK_ERROR("primal vector should have shape of (" << get_n_coeffs() << ", )");
   }
 
@@ -114,7 +113,7 @@ void ModelGeneralizedLinear::sdca_primal_dual_relation(const double l_l2sq,
     const double dual_i = dual_vector[i];
     const double factor = dual_i * _1_over_lbda_n;
 
-    if (fit_intercept){
+    if (fit_intercept) {
       // The last coefficient of out_primal_vector is the intercept
       ArrayDouble w = view(out_primal_vector, 0, get_n_coeffs() - 1);
       w.mult_incr(feature_i, factor);

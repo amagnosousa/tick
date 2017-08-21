@@ -72,7 +72,7 @@ class Model {
     TICK_CLASS_DOES_NOT_IMPLEMENT(get_class_name());
   }
 
-  virtual SArrayULongPtr get_sdca_index_map(){
+  virtual SArrayULongPtr get_sdca_index_map() {
     return nullptr;
   }
 
@@ -82,7 +82,7 @@ class Model {
 
   virtual void sdca_primal_dual_relation(const double l_l2sq,
                                          const ArrayDouble &dual_vector,
-                                         ArrayDouble &out_primal_vector){
+                                         ArrayDouble &out_primal_vector) {
     TICK_CLASS_DOES_NOT_IMPLEMENT(get_class_name());
   }
 

@@ -27,7 +27,6 @@ double ModelPoisReg::sdca_dual_min_i(const ulong i,
   } else {
     return sdca_dual_min_i_exponential(i, dual_i, primal_vector, previous_delta_dual_i, l_l2sq);
   }
-
 }
 
 double ModelPoisReg::sdca_dual_min_i_exponential(const ulong i,
@@ -98,7 +97,6 @@ double ModelPoisReg::sdca_dual_min_i_identity(const ulong i,
                                               const ArrayDouble &primal_vector,
                                               const double previous_delta_dual_i,
                                               double l_l2sq) {
-
   if (fit_intercept) {
     TICK_ERROR("SDCA not implemented with fit intercept yet");
   }
