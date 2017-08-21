@@ -72,6 +72,13 @@ class Model {
     TICK_CLASS_DOES_NOT_IMPLEMENT(get_class_name());
   }
 
+  /**
+   * For SDCA, sometimes observations might be discarded (Poisson regression). In this case
+   * this returns a mapping from the sampled observation (in [0, rand_max)) to the observation
+   * position (in [0, n_samples)).
+   * If nullptr is returned, then it means no index_map is required as the mapping is the
+   * canonical inedx_map[i] = i
+   */
   virtual SArrayULongPtr get_sdca_index_map() {
     return nullptr;
   }

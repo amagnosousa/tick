@@ -15,7 +15,7 @@ ModelPoisReg::ModelPoisReg(const SBaseArrayDouble2dPtr features,
                            labels,
                            fit_intercept,
                            n_threads),
-    link_type(link_type), non_zero_label_map_computed(false) {}
+    link_type(link_type), ready_non_zero_label_map(false) {}
 
 double ModelPoisReg::sdca_dual_min_i(const ulong i,
                                      const double dual_i,
@@ -89,7 +89,7 @@ void ModelPoisReg::init_non_zero_label_map() {
     }
   }
   n_non_zeros_labels = non_zero_labels->size();
-  non_zero_label_map_computed = true;
+  ready_non_zero_label_map = true;
 }
 
 double ModelPoisReg::sdca_dual_min_i_identity(const ulong i,
@@ -104,8 +104,6 @@ double ModelPoisReg::sdca_dual_min_i_identity(const ulong i,
   if (!ready_features_norm_sq) {
     compute_features_norm_sq();
   }
-
-//  const ulong i = get_non_zero_i(rand_i);
 
   const double label = get_label(i);
   if (label == 0) {
@@ -133,7 +131,7 @@ void ModelPoisReg::sdca_primal_dual_relation(const double l_l2sq,
     return;
   }
 
-  if (!non_zero_label_map_computed) init_non_zero_label_map();
+  if (!ready_non_zero_label_map) init_non_zero_label_map();
 
   if (dual_vector.size() != n_non_zeros_labels) {
     TICK_ERROR("dual vector should have shape of (" << n_non_zeros_labels << ", )");

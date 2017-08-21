@@ -19,7 +19,7 @@ enum class LinkType {
 class ModelPoisReg : public ModelGeneralizedLinear {
  private:
   LinkType link_type;
-  bool non_zero_label_map_computed;
+  bool ready_non_zero_label_map;
   VArrayULongPtr non_zero_labels;
   ulong n_non_zeros_labels;
 
@@ -48,11 +48,18 @@ class ModelPoisReg : public ModelGeneralizedLinear {
                                  const ArrayDouble &dual_vector,
                                  ArrayDouble &out_primal_vector) override;
 
+  /**
+   * Returns a mapping from the sampled observation (in [0, rand_max)) to the observation
+   * position (in [0, n_samples)). For identity link this is needed as zero labeled observations
+   * are discarded in SDCA.
+   * For exponential link nullptr is returned, it means no index_map is required as the mapping
+   * is the canonical inedx_map[i] = i
+   */
   SArrayULongPtr get_sdca_index_map() override {
     if (link_type == LinkType::exponential) {
       return nullptr;
     }
-    if (!non_zero_label_map_computed) init_non_zero_label_map();
+    if (!ready_non_zero_label_map) init_non_zero_label_map();
     return non_zero_labels;
   }
 
